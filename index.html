@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#ff5d8f" />
+  <title>قرار عاشقانه‌ی ما 💕</title>
+  <link href="fonts/vazirmatn.css" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    :root{
+      --pink:#ff5d8f;
+      --deep:#c9184a;
+      --rose:#ff8fab;
+      --cream:#fff0f3;
+    }
+    html, body{
+      margin:0; padding:0;
+      height:100%;
+      overflow:hidden;
+      font-family:"Vazirmatn", system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select:none;
+      -webkit-user-select:none;
+    }
+    #app{
+      position:fixed; inset:0;
+      height:100dvh; width:100vw;
+      background:
+        radial-gradient(circle at 20% 15%, #ffd0dd 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, #ffc2e2 0%, transparent 50%),
+        linear-gradient(160deg, #ff9ebb 0%, #ff5d8f 45%, #c9184a 100%);
+      overflow:hidden;
+    }
+
+    /* ---- پس‌زمینه‌ی قلب‌های شناور ---- */
+    .bg-hearts{ position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+    .bg-hearts span{
+      position:absolute; bottom:-40px;
+      font-size:22px; opacity:.35;
+      animation: rise linear infinite;
+      filter: drop-shadow(0 0 6px rgba(255,255,255,.4));
+    }
+    @keyframes rise{
+      0%  { transform: translateY(0) rotate(0deg) scale(.8); opacity:0; }
+      15% { opacity:.5; }
+      100%{ transform: translateY(-115dvh) rotate(360deg) scale(1.2); opacity:0; }
+    }
+
+    .screen{
+      position:absolute; inset:0;
+      display:flex; flex-direction:column;
+      z-index:1;
+    }
+
+    /* ---- سربرگ ---- */
+    .header{
+      flex:0 0 auto;
+      text-align:center;
+      padding: max(18px, env(safe-area-inset-top)) 16px 10px;
+      color:#fff;
+      text-shadow: 0 2px 10px rgba(201,24,74,.5);
+    }
+    .header .sub{ font-size:14px; opacity:.92; font-weight:600; }
+    .header h1{
+      margin:6px 0 0;
+      font-size: clamp(20px, 6vw, 30px);
+      font-weight:800;
+      letter-spacing:.3px;
+    }
+    .header .beat{ display:inline-block; animation: beat 1.1s ease-in-out infinite; }
+    @keyframes beat{ 0%,100%{transform:scale(1);} 25%{transform:scale(1.25);} 40%{transform:scale(1);} }
+
+    /* ---- صحنه‌ی حباب‌ها ---- */
+    .stage{ position:relative; flex:1 1 auto; overflow:hidden; }
+    .bubble{
+      position:absolute; top:0; left:0;
+      display:flex; align-items:center; justify-content:center; text-align:center;
+      padding:14px 18px;
+      max-width:44vw;
+      min-width:90px;
+      border-radius:50% 50% 50% 50% / 55% 55% 45% 45%;
+      color:#fff; font-weight:700; font-size: clamp(12px, 3.4vw, 16px);
+      line-height:1.35;
+      background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.55), rgba(255,255,255,.05) 60%),
+                  linear-gradient(150deg, var(--b1), var(--b2));
+      box-shadow: inset 0 0 18px rgba(255,255,255,.35), 0 10px 24px rgba(150,12,55,.35);
+      backdrop-filter: blur(2px);
+      will-change: transform;
+      cursor:pointer;
+      touch-action:none;
+      transition: transform .5s cubic-bezier(.34,1.56,.64,1);
+    }
+    .bubble.dodging{ transition: transform .42s cubic-bezier(.5,-0.4,.3,1.4); }
+    .bubble::after{
+      content:""; position:absolute; top:14%; right:18%;
+      width:22%; height:18%; border-radius:50%;
+      background:rgba(255,255,255,.6); filter:blur(2px);
+    }
+    .bubble.target{ animation: glow 1.6s ease-in-out infinite; }
+    @keyframes glow{
+      0%,100%{ box-shadow: inset 0 0 18px rgba(255,255,255,.5), 0 0 0 0 rgba(255,255,255,.5), 0 10px 24px rgba(150,12,55,.35);}
+      50%    { box-shadow: inset 0 0 22px rgba(255,255,255,.7), 0 0 22px 6px rgba(255,255,255,.35), 0 12px 28px rgba(150,12,55,.4);}
+    }
+    .bubble .tease{
+      position:absolute; top:-10px; left:50%; transform:translateX(-50%);
+      font-size:18px; pointer-events:none;
+      animation: pop .7s ease forwards;
+    }
+    @keyframes pop{ 0%{transform:translate(-50%,0) scale(.4); opacity:0;} 30%{opacity:1;} 100%{transform:translate(-50%,-26px) scale(1.2); opacity:0;} }
+
+    /* ---- صفحه‌ی زمان ---- */
+    .time-wrap{ flex:1 1 auto; display:flex; flex-direction:column; justify-content:center;
+      gap:14px; padding: 10px 22px max(24px, env(safe-area-inset-bottom)); overflow-y:auto; }
+    .time-card{
+      display:flex; align-items:center; gap:12px;
+      background: rgba(255,255,255,.92);
+      color:var(--deep);
+      border:none; border-radius:20px;
+      padding:18px 20px;
+      font-family:inherit; font-size: clamp(15px,4.2vw,18px); font-weight:700;
+      text-align:right;
+      box-shadow: 0 8px 22px rgba(150,12,55,.28);
+      cursor:pointer;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s;
+      animation: slideUp .5s ease both;
+    }
+    .time-card:active{ transform:scale(.96); }
+    .time-card .ic{ font-size:22px; flex:0 0 auto; }
+    .time-card .txt{ flex:1; }
+    @keyframes slideUp{ from{opacity:0; transform:translateY(24px);} to{opacity:1; transform:translateY(0);} }
+
+    /* ---- صفحه‌ی تشکر ---- */
+    .thanks{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      text-align:center; color:#fff; padding:24px; gap:18px; }
+    .thanks .bighearts{ font-size:64px; animation: beat 1.1s ease-in-out infinite; }
+    .thanks h2{ font-size: clamp(24px,7vw,34px); margin:0; font-weight:800; text-shadow:0 2px 12px rgba(201,24,74,.5); }
+    .thanks p{ font-size: clamp(15px,4.3vw,18px); margin:0; max-width:340px; line-height:1.8; opacity:.97; }
+    .summary{
+      background:rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.4);
+      border-radius:22px; padding:18px 22px; margin-top:6px;
+      backdrop-filter: blur(6px);
+      font-weight:700; line-height:2;
+    }
+    .summary .row{ display:flex; gap:8px; justify-content:center; align-items:center; }
+    .replay{
+      margin-top:8px; background:#fff; color:var(--deep); border:none;
+      padding:12px 26px; border-radius:30px; font-family:inherit; font-weight:800; font-size:15px;
+      box-shadow:0 8px 20px rgba(150,12,55,.3); cursor:pointer;
+    }
+    .replay:active{ transform:scale(.95); }
+
+    /* ---- ترنزیشن بین صفحات ---- */
+    .page-enter-active{ transition: all .55s cubic-bezier(.22,1,.36,1); }
+    .page-leave-active{ transition: all .45s cubic-bezier(.55,0,.45,1); position:absolute; inset:0; }
+    .page-enter-from{ opacity:0; transform: translateY(40px) scale(.92); }
+    .page-leave-to{ opacity:0; transform: translateY(-40px) scale(1.06); }
+
+    /* انفجار قلب هنگام انتخاب */
+    .burst{ position:absolute; inset:0; pointer-events:none; z-index:5; overflow:hidden; }
+    .burst span{ position:absolute; font-size:26px; animation: burst .9s ease-out forwards; }
+    @keyframes burst{
+      0%{ transform: translate(0,0) scale(.3); opacity:1; }
+      100%{ transform: translate(var(--bx), var(--by)) scale(1.4); opacity:0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- قلب‌های پس‌زمینه -->
+    <div class="bg-hearts">
+      <span v-for="h in bgHearts" :key="h.id" :style="h.style">{{ h.e }}</span>
+    </div>
+
+    <transition name="page" mode="out-in">
+      <!-- ====== صفحه ۱: مکان ====== -->
+      <section class="screen" v-if="step==='place'" key="place">
+        <div class="header">
+          <div class="sub"><s>زهرا</s> <sup>مهدیه</sup>، یه نظرسنجی کوچولو دارم ازت 🥰</div>
+          <h1>کجا بریم بیرون؟ <span class="beat">💖</span></h1>
+        </div>
+        <div class="stage" ref="stage">
+          <div
+            v-for="b in places"
+            :key="b.id"
+            class="bubble"
+            :class="{ target: b.target, dodging: b.dodging }"
+            :style="bubbleStyle(b)"
+            @pointerdown="onBubbleDown(b, $event)"
+          >
+            <span>{{ b.label }}</span>
+            <span class="tease" v-if="b.tease" :key="b.teaseKey">{{ b.tease }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== صفحه ۲: زمان ====== -->
+      <section class="screen" v-else-if="step==='time'" key="time">
+        <div class="header">
+          <div class="sub">عالیه! حالا یه چیز دیگه 💌</div>
+          <h1>کِی فرصت داری بریم؟ <span class="beat">💞</span></h1>
+        </div>
+        <div class="time-wrap">
+          <button
+            v-for="(t,i) in times"
+            :key="t.id"
+            class="time-card"
+            :style="{ animationDelay: (i*0.08)+'s' }"
+            @click="selectTime(t, $event)"
+          >
+            <span class="ic">{{ t.ic }}</span>
+            <span class="txt">{{ t.label }}</span>
+            <span style="font-size:18px">💘</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ====== صفحه ۳: تشکر ====== -->
+      <section class="screen" v-else key="thanks">
+        <div class="thanks">
+          <div class="bighearts">💕💖💕</div>
+          <h2>مرسی که شرکت کردی عشقم!</h2>
+          <p>ممنون که توی این نظرسنجیِ کوچولوی عاشقانه شرکت کردی. حالا قرارمون رسمی شد و دل من از همین الان قنج می‌ره! 🥰</p>
+          <div class="summary">
+            <div class="row">📍 <span>{{ chosenPlace }}</span></div>
+            <div class="row">⏰ <span>{{ chosenTime }}</span></div>
+          </div>
+          <p style="font-size:14px; opacity:.9">می‌بینمت اون‌جا... قلبم باهاته 💗</p>
+          <button class="replay" @click="reset">از اول 💞</button>
+        </div>
+      </section>
+    </transition>
+
+    <!-- انفجار قلب -->
+    <div class="burst" v-if="burst.length">
+      <span v-for="p in burst" :key="p.id" :style="p.style">{{ p.e }}</span>
+    </div>
+  </div>
+
+  <script src="vendor/vue.global.prod.js"></script>
+  <script>
+    const { createApp, reactive, ref, nextTick } = Vue;
+
+    const TEASES = ['🙈', '😜', '🏃‍♀️💨', 'نُچ نُچ!', 'این نه عشقم 😋', '🚫💕'];
+
+    createApp({
+      setup(){
+        const step = ref('place');
+        const stage = ref(null);
+        const burst = reactive([]);
+        const chosenPlace = ref('');
+        const chosenTime = ref('');
+
+        // قلب‌های پس‌زمینه
+        const bgHearts = [];
+        const emojis = ['💖','💕','💗','💓','❤️','💞','🌸'];
+        for(let i=0;i<16;i++){
+          bgHearts.push({
+            id:i,
+            e: emojis[Math.floor(Math.random()*emojis.length)],
+            style:{
+              left: (Math.random()*100)+'%',
+              fontSize: (16+Math.random()*22)+'px',
+              animationDuration: (7+Math.random()*8)+'s',
+              animationDelay: (-Math.random()*12)+'s',
+              opacity: .25+Math.random()*0.3
+            }
+          });
+        }
+
+        const places = reactive([
+          { id:1, label:'پارک وکیل‌آباد، والیبال', target:false },
+          { id:2, label:'بریم بیلیارد', target:false },
+          { id:3, label:'بریم پینگ‌پنگ', target:false },
+          { id:4, label:'بریم کله‌پاچه بخوریم، آخ‌جون 😋', target:true },
+          { id:5, label:'با دوست‌پسرِ دخترعمه‌ام بریم کوه', target:false },
+          { id:6, label:'بریم آی‌لقمه، ترافل شکلاتی بخوریم', target:false },
+        ]);
+        const hues = [
+          ['#ff8fab','#c9184a'], ['#ffa8c5','#ff5d8f'], ['#ff7eb3','#b5179e'],
+          ['#ff5d8f','#ff2d6f'], ['#ffb3c6','#e0457b'], ['#ff9ebb','#d62246']
+        ];
+        places.forEach((p,i)=>{
+          p.slot = i;            // جایگاه فعلی روی شبکه
+          p.tease=''; p.teaseKey=0; p.dodging=false;
+          p.b1=hues[i][0]; p.b2=hues[i][1];
+        });
+
+        const times = reactive([
+          { id:1, ic:'🌅', label:'همین چهارشنبه صبح' },
+          { id:2, ic:'📅', label:'۲۷ خرداد ۱۴۰۵' },
+          { id:3, ic:'⏭️', label:'پس‌فردا' },
+          { id:4, ic:'🗓️', label:'۱۷ ژوئن ۲۰۲۶' },
+        ]);
+
+        // مختصات ثابتِ جایگاه‌ها (۲ ستون × ۳ ردیف) که داخل صفحه می‌مانند
+        const slots = reactive([]);
+        function layout(){
+          const st = stage.value; if(!st) return;
+          const W = st.clientWidth, H = st.clientHeight;
+          const cols = 2, rows = Math.ceil(places.length/cols);
+          const arr = [];
+          for(let i=0;i<places.length;i++){
+            const col = i % cols, row = Math.floor(i/cols);
+            const cellW = W/cols, cellH = H/rows;
+            arr.push({ x: cellW*col + cellW/2, y: cellH*row + cellH/2 });
+          }
+          slots.splice(0, slots.length, ...arr);
+        }
+
+        function bubbleStyle(b){
+          const s = slots[b.slot] || { x:0, y:0 };
+          return {
+            transform: `translate(${s.x}px, ${s.y}px) translate(-50%, -50%)`,
+            '--b1': b.b1, '--b2': b.b2
+          };
+        }
+
+        let dodgeTimer = {};
+        function dodge(b){
+          // جابجایی به یک جایگاه دیگر تا از زیر دستِ کاربر در برود
+          const others = places.filter(p => p.slot !== b.slot);
+          if(others.length){
+            const partner = others[Math.floor(Math.random()*others.length)];
+            const tmp = b.slot; b.slot = partner.slot; partner.slot = tmp;
+          }
+          b.dodging = true;
+          clearTimeout(dodgeTimer[b.id]);
+          dodgeTimer[b.id] = setTimeout(()=>{ b.dodging=false; }, 450);
+          b.tease = TEASES[Math.floor(Math.random()*TEASES.length)];
+          b.teaseKey++;
+          setTimeout(()=>{ b.tease=''; }, 700);
+        }
+
+        function onBubbleDown(b, ev){
+          if(b.target){ selectPlace(b, ev); }
+          else { dodge(b); }
+        }
+
+        function spawnBurst(ev){
+          const x = ev?.clientX ?? window.innerWidth/2;
+          const y = ev?.clientY ?? window.innerHeight/2;
+          const es = ['💖','💕','💗','❤️','💞','✨'];
+          for(let i=0;i<14;i++){
+            const ang = (Math.PI*2)*(i/14);
+            const dist = 80+Math.random()*120;
+            burst.push({
+              id: Date.now()+'-'+i,
+              e: es[Math.floor(Math.random()*es.length)],
+              style:{
+                left: x+'px', top: y+'px',
+                '--bx': Math.cos(ang)*dist+'px',
+                '--by': Math.sin(ang)*dist+'px',
+                fontSize: (18+Math.random()*16)+'px'
+              }
+            });
+          }
+          setTimeout(()=>{ burst.splice(0, burst.length); }, 950);
+        }
+
+        function selectPlace(b, ev){
+          chosenPlace.value = b.label;
+          spawnBurst(ev);
+          setTimeout(()=>{ step.value='time'; }, 480);
+        }
+        function selectTime(t, ev){
+          chosenTime.value = t.label;
+          spawnBurst(ev);
+          setTimeout(()=>{ step.value='thanks'; }, 480);
+        }
+
+        function reset(){
+          chosenPlace.value=''; chosenTime.value='';
+          places.forEach((p,i)=>{ p.slot=i; p.tease=''; p.dodging=false; });
+          step.value='place';
+          nextTick(()=>{ setTimeout(layout, 50); });
+        }
+
+        function onResize(){ if(step.value==='place') layout(); }
+
+        Vue.onMounted(()=>{
+          nextTick(()=>{ setTimeout(layout, 60); });
+          window.addEventListener('resize', onResize);
+          window.addEventListener('orientationchange', onResize);
+        });
+        Vue.onUnmounted(()=>{
+          window.removeEventListener('resize', onResize);
+          window.removeEventListener('orientationchange', onResize);
+        });
+
+        return {
+          step, stage, places, times, bgHearts, burst,
+          chosenPlace, chosenTime,
+          bubbleStyle, onBubbleDown, selectTime, reset
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
