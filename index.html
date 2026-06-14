@@ -79,7 +79,7 @@
       padding:14px 18px;
       max-width:44vw;
       min-width:90px;
-      border-radius:50% 50% 50% 50% / 55% 55% 45% 45%;
+      border-radius:18px;
       color:#fff; font-weight:700; font-size: clamp(12px, 3.4vw, 16px);
       line-height:1.35;
       background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.55), rgba(255,255,255,.05) 60%),
@@ -97,17 +97,67 @@
       width:22%; height:18%; border-radius:50%;
       background:rgba(255,255,255,.6); filter:blur(2px);
     }
-    .bubble.target{ animation: glow 1.6s ease-in-out infinite; }
+    .bubble.target{
+      animation: glow 1.6s ease-in-out infinite, pulse 1.4s ease-in-out infinite;
+      cursor:pointer;
+    }
     @keyframes glow{
       0%,100%{ box-shadow: inset 0 0 18px rgba(255,255,255,.5), 0 0 0 0 rgba(255,255,255,.5), 0 10px 24px rgba(150,12,55,.35);}
       50%    { box-shadow: inset 0 0 22px rgba(255,255,255,.7), 0 0 22px 6px rgba(255,255,255,.35), 0 12px 28px rgba(150,12,55,.4);}
     }
+    /* پالسِ هدفِ ثابت در وسط صفحه — ترنسلیت برای حفظ مرکز ثابت می‌ماند */
+    @keyframes pulse{
+      0%,100%{ transform: translate(-50%,-50%) scale(1); }
+      50%    { transform: translate(-50%,-50%) scale(1.09); }
+    }
     .bubble .tease{
       position:absolute; top:-10px; left:50%; transform:translateX(-50%);
-      font-size:18px; pointer-events:none;
-      animation: pop .7s ease forwards;
+      font-size:18px; pointer-events:none; white-space:nowrap;
+      animation: pop 1.8s ease forwards;
     }
-    @keyframes pop{ 0%{transform:translate(-50%,0) scale(.4); opacity:0;} 30%{opacity:1;} 100%{transform:translate(-50%,-26px) scale(1.2); opacity:0;} }
+    @keyframes pop{
+      0%  {transform:translate(-50%,0) scale(.4); opacity:0;}
+      12% {opacity:1;}
+      75% {transform:translate(-50%,-22px) scale(1.12); opacity:1;}
+      100%{transform:translate(-50%,-34px) scale(1.2); opacity:0;}
+    }
+
+    /* ---- صفحه‌ی رمز عبور ---- */
+    .lock-screen{ align-items:center; justify-content:center; padding:24px; }
+    .lock-card{
+      background:rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.4);
+      border-radius:26px; padding:30px 26px;
+      backdrop-filter: blur(8px);
+      text-align:center; color:#fff;
+      width:100%; max-width:340px;
+      box-shadow:0 14px 40px rgba(150,12,55,.35);
+    }
+    .lock-emoji{ font-size:52px; animation: beat 1.1s ease-in-out infinite; }
+    .lock-card h1{ margin:12px 0 4px; font-size: clamp(22px,6vw,28px); font-weight:800;
+      text-shadow:0 2px 10px rgba(201,24,74,.5); }
+    .lock-card p{ margin:0 0 18px; font-size:15px; opacity:.95; font-weight:600; }
+    .lock-card form{ display:flex; flex-direction:column; gap:12px; }
+    .lock-card input{
+      font-family:inherit; font-size:17px; text-align:center; font-weight:700;
+      padding:14px 16px; border-radius:16px; border:none;
+      background:rgba(255,255,255,.94); color:var(--deep);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.3);
+    }
+    .lock-card input:focus{ outline:none; box-shadow: inset 0 0 0 2px var(--pink); }
+    .lock-card input.shake{ animation: shake .4s ease; }
+    .lock-card button{
+      font-family:inherit; font-size:16px; font-weight:800;
+      padding:14px 16px; border-radius:16px; border:none; cursor:pointer;
+      background:#fff; color:var(--deep);
+      box-shadow:0 8px 20px rgba(150,12,55,.3);
+      transition: transform .15s ease;
+    }
+    .lock-card button:active{ transform:scale(.96); }
+    .lock-error{ margin-top:14px; font-size:14px; font-weight:700; color:#fff;
+      background:rgba(201,24,74,.5); border-radius:12px; padding:8px 12px; }
+    @keyframes shake{ 0%,100%{transform:translateX(0);} 20%{transform:translateX(-9px);}
+      40%{transform:translateX(8px);} 60%{transform:translateX(-6px);} 80%{transform:translateX(4px);} }
 
     /* ---- صفحه‌ی زمان ---- */
     .time-wrap{ flex:1 1 auto; display:flex; flex-direction:column; justify-content:center;
@@ -174,13 +224,36 @@
     </div>
 
     <transition name="page" mode="out-in">
+      <!-- ====== صفحه ۰: رمز عبور ====== -->
+      <section class="screen lock-screen" v-if="step==='lock'" key="lock">
+        <div class="lock-card">
+          <div class="lock-emoji">🔒💕</div>
+          <h1>سلام <s>زهرا</s> مهدیه</h1>
+          <p>برای ورود رمز رو وارد کن 🥰</p>
+          <form @submit.prevent="unlock">
+            <input
+              ref="pwInput"
+              v-model="pw"
+              :class="{ shake: pwError }"
+              type="password"
+              inputmode="text"
+              autocomplete="off"
+              placeholder="رمز عبور را وارد کنید"
+              @input="pwError=false"
+            />
+            <button type="submit">ورود 💞</button>
+          </form>
+          <div class="lock-error" v-if="pwError">رمز درست نیست، دوباره امتحان کن 🙈</div>
+        </div>
+      </section>
+
       <!-- ====== صفحه ۱: مکان ====== -->
-      <section class="screen" v-if="step==='place'" key="place">
+      <section class="screen" v-else-if="step==='place'" key="place">
         <div class="header">
-          <div class="sub"><s>زهرا</s> <sup>مهدیه</sup>، یه نظرسنجی کوچولو دارم ازت 🥰</div>
+          <div class="sub" style="font-size: 1.2rem"><s>زهرا</s> مهدیه، یه نظرسنجی کوچولو دارم ازت 🥰</div>
           <h1>کجا بریم بیرون؟ <span class="beat">💖</span></h1>
         </div>
-        <div class="stage" ref="stage">
+        <div class="stage" ref="stage" @pointermove="onStageMove($event)">
           <div
             v-for="b in places"
             :key="b.id"
@@ -188,6 +261,7 @@
             :class="{ target: b.target, dodging: b.dodging }"
             :style="bubbleStyle(b)"
             @pointerdown="onBubbleDown(b, $event)"
+            @pointerenter="onBubbleHover(b, $event)"
           >
             <span>{{ b.label }}</span>
             <span class="tease" v-if="b.tease" :key="b.teaseKey">{{ b.tease }}</span>
@@ -220,13 +294,13 @@
       <section class="screen" v-else key="thanks">
         <div class="thanks">
           <div class="bighearts">💕💖💕</div>
-          <h2>مرسی که شرکت کردی عشقم!</h2>
-          <p>ممنون که توی این نظرسنجیِ کوچولوی عاشقانه شرکت کردی. حالا قرارمون رسمی شد و دل من از همین الان قنج می‌ره! 🥰</p>
+          <h2>مرسی که شرکت کردی !</h2>
+          <p>ممنون که توی این نظرسنجیِ کوچولو شرکت کردی. بد قولی نکن که ناراحت میشم به شدت! 🥰</p>
           <div class="summary">
             <div class="row">📍 <span>{{ chosenPlace }}</span></div>
             <div class="row">⏰ <span>{{ chosenTime }}</span></div>
           </div>
-          <p style="font-size:14px; opacity:.9">می‌بینمت اون‌جا... قلبم باهاته 💗</p>
+          <p style="font-size:14px; opacity:.9">می‌بینمت اون‌جا...  💗</p>
           <button class="replay" @click="reset">از اول 💞</button>
         </div>
       </section>
@@ -242,15 +316,30 @@
   <script>
     const { createApp, reactive, ref, nextTick } = Vue;
 
-    const TEASES = ['🙈', '😜', '🏃‍♀️💨', 'نُچ نُچ!', 'این نه عشقم 😋', '🚫💕'];
+    const TEASES = ['بشین بچه 🍼', 'این که اصلا!', 'شوخی میکنی؟', 'نُچ نُچ!', 'این نه 😋', 'کات تا ابد!'];
 
     createApp({
       setup(){
-        const step = ref('place');
+        const step = ref('lock');
         const stage = ref(null);
         const burst = reactive([]);
         const chosenPlace = ref('');
         const chosenTime = ref('');
+
+        // ---- رمز عبور (هاردکدشده در فرانت) ----
+        const PASSWORD = 'ilovenutella';
+        const pw = ref('');
+        const pwError = ref(false);
+        const pwInput = ref(null);
+        function unlock(){
+          if(pw.value === PASSWORD){
+            pwError.value = false;
+            step.value = 'place';
+            nextTick(startPlace);
+          } else {
+            pwError.value = true;
+          }
+        }
 
         // قلب‌های پس‌زمینه
         const bgHearts = [];
@@ -275,6 +364,8 @@
           { id:3, label:'بریم پینگ‌پنگ', target:false },
           { id:4, label:'بریم کله‌پاچه بخوریم، آخ‌جون 😋', target:true },
           { id:5, label:'با دوست‌پسرِ دخترعمه‌ام بریم کوه', target:false },
+          // { id:5, label:'بریم جلسه شعر', target:false },
+          // { id:5, label:'بریم جلسه شعر', target:false },
           { id:6, label:'بریم آی‌لقمه، ترافل شکلاتی بخوریم', target:false },
         ]);
         const hues = [
@@ -282,7 +373,7 @@
           ['#ff5d8f','#ff2d6f'], ['#ffb3c6','#e0457b'], ['#ff9ebb','#d62246']
         ];
         places.forEach((p,i)=>{
-          p.slot = i;            // جایگاه فعلی روی شبکه
+          p.x=0; p.y=0; p.vx=0; p.vy=0;   // موقعیت و سرعتِ شناوری
           p.tease=''; p.teaseKey=0; p.dodging=false;
           p.b1=hues[i][0]; p.b2=hues[i][1];
         });
@@ -294,48 +385,121 @@
           { id:4, ic:'🗓️', label:'۱۷ ژوئن ۲۰۲۶' },
         ]);
 
-        // مختصات ثابتِ جایگاه‌ها (۲ ستون × ۳ ردیف) که داخل صفحه می‌مانند
-        const slots = reactive([]);
-        function layout(){
+        // ابعاد صحنه و حلقه‌ی انیمیشن
+        const bounds = reactive({ W:0, H:0 });
+        let raf = 0;
+        let dodgeTimer = {};
+        const rand = (a,b)=> a + Math.random()*(b-a);
+
+        // موقعیت اولیه: هدف در مرکز، بقیه پراکنده و دور از مرکز
+        function seedFloat(){
           const st = stage.value; if(!st) return;
           const W = st.clientWidth, H = st.clientHeight;
-          const cols = 2, rows = Math.ceil(places.length/cols);
-          const arr = [];
-          for(let i=0;i<places.length;i++){
-            const col = i % cols, row = Math.floor(i/cols);
-            const cellW = W/cols, cellH = H/rows;
-            arr.push({ x: cellW*col + cellW/2, y: cellH*row + cellH/2 });
+          bounds.W = W; bounds.H = H;
+          const m = 70;
+          places.forEach(p=>{
+            if(p.target){ p.x = W/2; p.y = H/2; p.vx = 0; p.vy = 0; return; }
+            let x, y, tries = 0;
+            do{
+              x = rand(m, W-m); y = rand(m, H-m); tries++;
+            }while(Math.hypot(x-W/2, y-H/2) < Math.min(W,H)*0.28 && tries < 30);
+            p.x = x; p.y = y;
+            const ang = rand(0, Math.PI*2), sp = rand(1.6, 2.8);
+            p.vx = Math.cos(ang)*sp; p.vy = Math.sin(ang)*sp;
+          });
+        }
+
+        // حلقه‌ی شناوری: حرکت آرام، برخورد با لبه‌ها و دفع از مرکز
+        function tick(){
+          if(step.value !== 'place'){ raf = 0; return; }
+          const W = bounds.W, H = bounds.H, m = 56;
+          for(const p of places){
+            if(p.target){ p.x = W/2; p.y = H/2; continue; }
+            p.x += p.vx; p.y += p.vy;
+            p.vx *= 0.995; p.vy *= 0.995;            // اصطکاک خیلی کم
+            let sp = Math.hypot(p.vx, p.vy);
+            if(sp < 1.4){                             // همیشه سرزنده و شناور بماند
+              const a = rand(0, Math.PI*2);
+              p.vx += Math.cos(a)*0.5; p.vy += Math.sin(a)*0.5;
+            }
+            const max = 14;
+            if(sp > max){ p.vx = p.vx/sp*max; p.vy = p.vy/sp*max; }
+            if(p.x < m){ p.x = m; p.vx = Math.abs(p.vx); }
+            if(p.x > W-m){ p.x = W-m; p.vx = -Math.abs(p.vx); }
+            if(p.y < m){ p.y = m; p.vy = Math.abs(p.vy); }
+            if(p.y > H-m){ p.y = H-m; p.vy = -Math.abs(p.vy); }
+            // دفع از مرکز تا روی هدف نیفتند
+            const dcx = p.x - W/2, dcy = p.y - H/2, dc = Math.hypot(dcx,dcy) || 1;
+            if(dc < Math.min(W,H)*0.22){
+              p.vx += dcx/dc*0.3; p.vy += dcy/dc*0.3;
+            }
           }
-          slots.splice(0, slots.length, ...arr);
+          raf = requestAnimationFrame(tick);
+        }
+        function startLoop(){ if(!raf){ raf = requestAnimationFrame(tick); } }
+        function stopLoop(){ if(raf){ cancelAnimationFrame(raf); raf = 0; } }
+
+        // پس از ترنزیشن out-in عنصر stage کمی دیرتر mount می‌شود؛ صبر می‌کنیم
+        function startPlace(){
+          let tries = 0;
+          (function wait(){
+            if(step.value !== 'place') return;
+            if(stage.value && stage.value.clientWidth){ seedFloat(); startLoop(); }
+            else if(tries++ < 60){ setTimeout(wait, 40); }
+          })();
         }
 
         function bubbleStyle(b){
-          const s = slots[b.slot] || { x:0, y:0 };
-          return {
-            transform: `translate(${s.x}px, ${s.y}px) translate(-50%, -50%)`,
-            '--b1': b.b1, '--b2': b.b2
-          };
+          if(b.target){
+            // هدف ثابت در وسط؛ پالس از طریق انیمیشن CSS اعمال می‌شود
+            return { left:'50%', top:'50%', transform:'translate(-50%,-50%)',
+                     '--b1': b.b1, '--b2': b.b2 };
+          }
+          return { left: b.x+'px', top: b.y+'px', transform:'translate(-50%,-50%)',
+                   '--b1': b.b1, '--b2': b.b2 };
         }
 
-        let dodgeTimer = {};
-        function dodge(b){
-          // جابجایی به یک جایگاه دیگر تا از زیر دستِ کاربر در برود
-          const others = places.filter(p => p.slot !== b.slot);
-          if(others.length){
-            const partner = others[Math.floor(Math.random()*others.length)];
-            const tmp = b.slot; b.slot = partner.slot; partner.slot = tmp;
-          }
+        function stagePoint(ev){
+          const r = stage.value.getBoundingClientRect();
+          return { x: ev.clientX - r.left, y: ev.clientY - r.top };
+        }
+
+        // فراری‌دادنِ یک آیتم در خلافِ جهتِ دستِ کاربر
+        function fleeFrom(b, ev){
+          const pt = stagePoint(ev);
+          const dx = b.x - pt.x, dy = b.y - pt.y, d = Math.hypot(dx,dy) || 1;
+          const sp = 7;
+          b.vx = dx/d*sp; b.vy = dy/d*sp;
           b.dodging = true;
           clearTimeout(dodgeTimer[b.id]);
           dodgeTimer[b.id] = setTimeout(()=>{ b.dodging=false; }, 450);
           b.tease = TEASES[Math.floor(Math.random()*TEASES.length)];
           b.teaseKey++;
-          setTimeout(()=>{ b.tease=''; }, 700);
+          setTimeout(()=>{ b.tease=''; }, 1800);
         }
 
+        // وقتی نشانگر به آیتم‌ها نزدیک می‌شود، آن‌ها را پس می‌زند
+        function onStageMove(ev){
+          const pt = stagePoint(ev);
+          for(const p of places){
+            if(p.target) continue;
+            const dx = p.x - pt.x, dy = p.y - pt.y, d = Math.hypot(dx,dy);
+            if(d < 115){
+              const f = (115 - d)/115 * 1.6, nx = dx/(d||1), ny = dy/(d||1);
+              p.vx += nx*f; p.vy += ny*f;
+              if(d < 70 && !p.tease){
+                p.tease = TEASES[Math.floor(Math.random()*TEASES.length)];
+                p.teaseKey++;
+                setTimeout(()=>{ p.tease=''; }, 1800);
+              }
+            }
+          }
+        }
+
+        function onBubbleHover(b, ev){ if(!b.target) fleeFrom(b, ev); }
         function onBubbleDown(b, ev){
           if(b.target){ selectPlace(b, ev); }
-          else { dodge(b); }
+          else { fleeFrom(b, ev); }
         }
 
         function spawnBurst(ev){
@@ -372,19 +536,20 @@
 
         function reset(){
           chosenPlace.value=''; chosenTime.value='';
-          places.forEach((p,i)=>{ p.slot=i; p.tease=''; p.dodging=false; });
+          places.forEach(p=>{ p.tease=''; p.dodging=false; });
           step.value='place';
-          nextTick(()=>{ setTimeout(layout, 50); });
+          nextTick(startPlace);
         }
 
-        function onResize(){ if(step.value==='place') layout(); }
+        function onResize(){ if(step.value==='place') seedFloat(); }
 
         Vue.onMounted(()=>{
-          nextTick(()=>{ setTimeout(layout, 60); });
+          if(step.value === 'place') nextTick(startPlace);
           window.addEventListener('resize', onResize);
           window.addEventListener('orientationchange', onResize);
         });
         Vue.onUnmounted(()=>{
+          stopLoop();
           window.removeEventListener('resize', onResize);
           window.removeEventListener('orientationchange', onResize);
         });
@@ -392,7 +557,8 @@
         return {
           step, stage, places, times, bgHearts, burst,
           chosenPlace, chosenTime,
-          bubbleStyle, onBubbleDown, selectTime, reset
+          pw, pwError, pwInput, unlock,
+          bubbleStyle, onBubbleDown, onBubbleHover, onStageMove, selectTime, reset
         };
       }
     }).mount('#app');
