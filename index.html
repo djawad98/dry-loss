@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#ff5d8f" />
   <title>قرار عاشقانه‌ی ما 💕</title>
   <link href="fonts/vazirmatn.css" rel="stylesheet">
+  <link rel="prefetch" href="music.mp3" as="audio">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     :root{
@@ -310,6 +311,9 @@
     <div class="burst" v-if="burst.length">
       <span v-for="p in burst" :key="p.id" :style="p.style">{{ p.e }}</span>
     </div>
+
+    <!-- موسیقی پس‌زمینه -->
+    <audio ref="bgm" src="music.mp3" loop preload="auto"></audio>
   </div>
 
   <script src="vendor/vue.global.prod.js"></script>
@@ -326,6 +330,14 @@
         const chosenPlace = ref('');
         const chosenTime = ref('');
 
+        // ---- موسیقی پس‌زمینه ----
+        const bgm = ref(null);
+        function playMusic(){
+          const a = bgm.value; if(!a) return;
+          a.volume = 0.2;
+          a.play().catch(()=>{});   // در صورت بلاک‌شدن، با اولین تعامل دوباره تلاش می‌شود
+        }
+
         // ---- رمز عبور (هاردکدشده در فرانت) ----
         const PASSWORD = 'ilovenutella';
         const pw = ref('');
@@ -334,6 +346,7 @@
         function unlock(){
           if(pw.value === PASSWORD){
             pwError.value = false;
+            playMusic();              // پس از تعامل کاربر، پخش مجاز است
             step.value = 'place';
             nextTick(startPlace);
           } else {
@@ -557,7 +570,7 @@
         return {
           step, stage, places, times, bgHearts, burst,
           chosenPlace, chosenTime,
-          pw, pwError, pwInput, unlock,
+          pw, pwError, pwInput, unlock, bgm,
           bubbleStyle, onBubbleDown, onBubbleHover, onStageMove, selectTime, reset
         };
       }
